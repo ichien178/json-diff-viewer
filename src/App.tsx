@@ -52,6 +52,7 @@ export function App(): React.ReactElement {
   const [after, setAfter] = useState(() => JSON.stringify({ a: 2, tags: ['a', 'b', 'c'] }, null, 2));
   const [sortKeys, setSortKeys] = useState(true);
   const [ignoreOrder, setIgnoreOrder] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const diff = useJsonDiff(before, after, sortKeys, ignoreOrder);
 
@@ -93,6 +94,47 @@ export function App(): React.ReactElement {
     return null;
   }, [diff]);
 
+  const diffText = useMemo(() => {
+    if (Array.isArray(diff)) {
+      const lines: string[] = [];
+      for (const part of diff) {
+        const prefix = part.added ? '+ ' : part.removed ? '- ' : '  ';
+        const text = part.value;
+        const arr = text.split('\n');
+        for (let i = 0; i < arr.length; i++) {
+          const line = arr[i];
+          const isLastEmpty = i === arr.length - 1 && line === '';
+          if (isLastEmpty) continue;
+          lines.push(prefix + line);
+        }
+      }
+      return lines.join('\n');
+    }
+    return `JSON parse error: ${diff.error}`;
+  }, [diff]);
+
+  const onCopyDiff = useCallback(async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(diffText);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = diffText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1200);
+    } catch (_e) {
+      // swallow
+    }
+  }, [diffText]);
+
   return (
     <>
       <header>
@@ -101,6 +143,8 @@ export function App(): React.ReactElement {
       <div className="controls">
         <button id="format" onClick={onFormat}>Format JSON</button>
         <button id="swap" onClick={onSwap}>Swap</button>
+        <button onClick={onCopyDiff}>Copy diff</button>
+        {copied && <span className="small">Copied!</span>}
         <label className="small">
           <input type="checkbox" checked={ignoreOrder} onChange={(e) => setIgnoreOrder(e.target.checked)} /> Ignore array order
         </label>
