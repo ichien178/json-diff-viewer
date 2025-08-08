@@ -1,0 +1,25 @@
+{
+  "name": "json-diff-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 5173"
+  },
+  "dependencies": {
+    "diff": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^7.0.2",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.1"
+  },
+  "packageManager": "pnpm@10.14.0"
+}
