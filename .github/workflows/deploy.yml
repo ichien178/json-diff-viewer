@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'latest'
-          cache: 'pnpm'
+          # pnpm cache requires pnpm pre-installed; we enable via corepack below
 
       - name: Enable corepack & set pnpm
         run: |
